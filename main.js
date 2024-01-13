@@ -22,21 +22,43 @@ function createElement(type, props, ...children) {
     type,
     props: {
       ...props,
-      children
+      children: children.map(child => {
+        return typeof child === 'string' ? createTextNode(child) : child
+      })
     }
   }
 }
 
+
+function render(el, container) {
+  const dom = el.type === "TEXT_ELEMENT" ? document.createTextNode("") : document.createElement(el.type)
+  Object.keys(el.props).forEach(key => {
+    if (key !== "children") {
+      dom[key] = el.props[key]
+    }
+  })
+
+  const children = el.props.children;
+  children.forEach(child => {
+    render(child, dom)
+  })
+
+  container.append(dom)
+}
+
 const textEl = createTextNode('app')
-const App = createElement('div', { id: 'app' }, textEl)
+const App = createElement('div', { id: 'app' }, 'hi,', 'mini-react')
 
 
+const ReactDOM = {
+  createRoot(container) {
+    return {
+      render(App) {
+        render(App, container)
+      }
+    }
+  }
+}
 
-const dom = document.createElement(App.type)
-dom.id = App.props.id
-document.querySelector('#root').append(dom)
 
-
-const textNode = document.createTextNode("")
-textNode.nodeValue = textEl.props.nodeValue
-dom.append(textNode)
+ReactDOM.createRoot(document.querySelector('#root')).render(App)
