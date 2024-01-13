@@ -1,12 +1,3 @@
-// v1 
-// const dom = document.createElement('div')
-// dom.id = 'app'
-// document.querySelector('#root').append(dom)
-
-
-// const textNode = document.createTextNode("")
-// textNode.nodeValue = 'app'
-// dom.append(textNode)
 
 
 // v2 react -> vdom -> js object
@@ -15,31 +6,34 @@
 
 // type props children
 
-const textEl = {
-  type: 'div',
-  props: {
-    id: 'app',
-    children: {
-      type: 'TEXT_ELEMENT',
-      props: {
-        nodeValue: 'app',
-        children: []
-      }
+
+function createTextNode(text) {
+  return {
+    type: 'TEXT_ELEMENT',
+    props: {
+      nodeValue: text,
+      children: []
     }
   }
 }
 
-const el = {
-  type: 'div',
-  props: {
-    id: 'app',
-    children: [textEl]
+function createElement(type, props, ...children) {
+  return {
+    type,
+    props: {
+      ...props,
+      children
+    }
   }
 }
 
+const textEl = createTextNode('app')
+const App = createElement('div', { id: 'app' }, textEl)
 
-const dom = document.createElement(el.type)
-dom.id = el.props.id
+
+
+const dom = document.createElement(App.type)
+dom.id = App.props.id
 document.querySelector('#root').append(dom)
 
 
