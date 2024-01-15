@@ -4,5 +4,8 @@
 	},
 	"devDependencies": {
 		"vitest": "^1.2.0"
+	},
+	"volta": {
+		"node": "18.18.2"
 	}
 }
