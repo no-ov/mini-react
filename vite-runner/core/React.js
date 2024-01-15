@@ -106,7 +106,7 @@ function performWorkOfUnit(work) {
 }
 
 
-let nextWorkOfUnit = null;
+let root = null, nextWorkOfUnit = null;
 function workLoop(deadline) {
   let shouldYield = false;
   if (!shouldYield && nextWorkOfUnit) {
@@ -116,7 +116,23 @@ function workLoop(deadline) {
     nextWorkOfUnit = performWorkOfUnit(nextWorkOfUnit)
     shouldYield = deadline.timeRemaining() < 1;
   }
+
+  if (!nextWorkOfUnit && root) {
+    commitRoot()
+  }
   window.requestIdleCallback(workLoop)
+}
+
+function commitRoot() {
+  commitWork(root.child)
+  root = null
+}
+
+function commitWork(fiber) {
+  if (!fiber) return;
+  fiber.parent.dom.append(fiber.dom)
+  commitWork(fiber.child)
+  commitWork(fiber.sibling)
 }
 
 const React = {
