@@ -1,5 +1,24 @@
-import React from './core/React.js'
+import React from "./core/React.js";
 
-const App = <div>hi, mini-react</div>
+function SonCount() {
+  return <div>Son</div>;
+}
 
-export default App
+function Counter() {
+  return (
+    <div>
+      counter<SonCount></SonCount>
+    </div>
+  );
+}
+
+const App = (
+  <div>
+    hi, mini-react
+    <Counter>
+      <SonCount></SonCount>
+    </Counter>
+  </div>
+);
+
+export default App;

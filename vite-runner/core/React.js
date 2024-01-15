@@ -3,8 +3,8 @@ function createTextNode(text) {
     type: 'TEXT_ELEMENT',
     props: {
       nodeValue: text,
-      children: []
-    }
+      children: [],
+    },
   }
 }
 
@@ -13,114 +13,98 @@ function createElement(type, props, ...children) {
     type,
     props: {
       ...props,
-      children: children.map(child => {
-        return typeof child === 'string' ? createTextNode(child) : child
-      })
-    }
+      children: children.map((child) => {
+        const isTextNode = typeof child === "string" || typeof child === "number"
+        return isTextNode ? createTextNode(child) : child
+      }),
+    },
   }
 }
-
 
 function render(el, container) {
   nextWorkOfUnit = {
     dom: container,
     props: {
-      children: [el]
-    }
+      children: [el],
+    },
   }
+  root = nextWorkOfUnit
 }
 
 function createDom(type) {
-  return type === "TEXT_ELEMENT"
-    ? document.createTextNode("")
-    : document.createElement(type);
+  return type === 'TEXT_ELEMENT' ? document.createTextNode('') : document.createElement(type)
 }
-
-function updateDomAttribute(dom, props) {
+function updateProps(dom, props) {
   Object.keys(props).forEach((key) => {
-    if (key !== "children") {
-      dom[key] = props[key];
+    if (key !== 'children') {
+      dom[key] = props[key]
     }
-  });
+  })
 }
-
-
-function initWork(work) {
-  let prevChild = null;
-  work.props.children.forEach((child, idx) => {
-    const newWork = {
+function initChildren(fiber, children) {
+  // const children = fiber.props.children
+  let prevChild = null
+  children.forEach((child, index) => {
+    const newFiber = {
       type: child.type,
       props: child.props,
       child: null,
-      parent: work,
+      parent: fiber,
       sibling: null,
-      dom: null
+      dom: null,
     }
-
-    console.log('newWork', newWork)
-
-    if (idx === 0) {
-      work.child = newWork;
+    if (index === 0) {
+      fiber.child = newFiber
     } else {
-      prevChild.sibling = newWork
+      prevChild.sibling = newFiber
     }
-    prevChild = newWork
+    prevChild = newFiber
   })
 }
-
-
-
-function performWorkOfUnit(work) {
+function perforWorkOfUnit(fiber) {
+  const isFuntionComponent = typeof fiber.type === "function"
+  isFuntionComponent && console.log(fiber.type)
   // 1. 创建 dom
-  if (!work.dom) {
+  if (!isFuntionComponent) {
+    if (!fiber.dom) {
+      const dom = (fiber.dom = createDom(fiber.type))
+      // fiber.parent.dom.append(dom)
 
-
-    const dom = (work.dom = createDom(work.type));
-
-    console.log('dom: ', dom)
-
-    // 2. 处理 props
-    updateDomAttribute(dom, work.props)
-
-    console.log('work: ', work)
-    work.parent.dom.append(dom)
-
+      // 2. 处理 props
+      updateProps(dom, fiber.props)
+    }
   }
 
-
-
-  // 3. 转换链表 设置指针
-  initWork(work)
-
+  // 3. 转换链表 设置好指针
+  const children = isFuntionComponent ? [fiber.type(fiber.props)] : fiber.props.children
+  initChildren(fiber, children)
 
   // 4. 返回下一个要执行的任务
-  if (work.child) {
-    return work.child
+  if (fiber.child) {
+    return fiber.child
   }
-
-  if (work.sibling) {
-    return work.sibling
+  if (fiber.sibling) {
+    return fiber.sibling
   }
-
-  return work.parent?.sibling
+  let nextFiber = fiber
+  while (nextFiber) {
+    if (nextFiber.sibling) return nextFiber.sibling
+    nextFiber = nextFiber.parent
+  }
 }
-
-
-let root = null, nextWorkOfUnit = null;
+let nextWorkOfUnit = null
+let root = null
 function workLoop(deadline) {
-  let shouldYield = false;
-  if (!shouldYield && nextWorkOfUnit) {
-    // run task
-    // dom render
-    console.log('nextWorkOfUnit', nextWorkOfUnit)
-    nextWorkOfUnit = performWorkOfUnit(nextWorkOfUnit)
-    shouldYield = deadline.timeRemaining() < 1;
+  let shouldYield = false
+  while (!shouldYield && nextWorkOfUnit) {
+    nextWorkOfUnit = perforWorkOfUnit(nextWorkOfUnit)
+    shouldYield = deadline.timeRemaining() < 0
   }
 
   if (!nextWorkOfUnit && root) {
     commitRoot()
   }
-  window.requestIdleCallback(workLoop)
+  requestIdleCallback(workLoop)
 }
 
 function commitRoot() {
@@ -129,17 +113,25 @@ function commitRoot() {
 }
 
 function commitWork(fiber) {
-  if (!fiber) return;
-  fiber.parent.dom.append(fiber.dom)
+  if (!fiber) return
+  let fiberParent = fiber.parent
+  while (!fiberParent.dom) {
+    fiberParent = fiberParent.parent
+  }
+  if (fiber.dom) {
+    fiberParent.dom.append(fiber.dom)
+  }
   commitWork(fiber.child)
   commitWork(fiber.sibling)
+
 }
+
+
+requestIdleCallback(workLoop)
 
 const React = {
   render,
   createElement,
 }
-
-workLoop()
 
 export default React
