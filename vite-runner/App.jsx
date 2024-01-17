@@ -4,10 +4,18 @@ function SonCount() {
   return <div>Son</div>;
 }
 
-function Counter() {
+let count = 10;
+function Counter({ num }) {
+  function handleClick() {
+    console.log("[ click ] >");
+    count++;
+    React.update();
+  }
   return (
     <div>
-      counter<SonCount></SonCount>
+      count:{count}
+      <SonCount></SonCount>
+      <button onClick={handleClick}>点击</button>
     </div>
   );
 }
@@ -15,9 +23,7 @@ function Counter() {
 const App = (
   <div>
     hi, mini-react
-    <Counter>
-      <SonCount></SonCount>
-    </Counter>
+    <Counter></Counter>
   </div>
 );
 
