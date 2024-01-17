@@ -17,3 +17,8 @@
 
 8. 统一提交实现
 9. 实现 function component
+
+## 进军 vdom 的更新
+
+10. 实现事件绑定
+11. 实现更新 props
