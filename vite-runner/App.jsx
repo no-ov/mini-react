@@ -43,19 +43,20 @@ function Counter({ num }) {
   );
 }
 
-let countFoo = 1;
 function Foo() {
-  console.log("foo rerun");
-  let update = React.update();
+  const [count, setCount] = React.useState(9);
+  const [bar, setBar] = React.useState("bar");
   function handleClick() {
-    countFoo++;
-    update();
+    setCount((c) => c + 1);
+    setBar((pre) => pre + "bar");
+    setBar("barbar");
   }
   return (
     <div>
       <h1>foo</h1>
       <button onClick={handleClick}>click</button>
-      {countFoo}
+      {count}
+      {bar}
     </div>
   );
 }

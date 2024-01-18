@@ -174,6 +174,8 @@ function commitWork(fiber) {
 }
 
 function updateFunctionComponent(fiber) {
+  stateHooks = []
+  stateHookIndex = 0
   wipFiber = fiber
   let children = [fiber.type(fiber.props)]
   reconcileChildren(fiber, children)
@@ -217,9 +219,47 @@ const update = () => {
   }
 }
 
+let stateHooks;
+let stateHookIndex;
+function useState(initial) {
+  let currentFiber = wipFiber
+  const oldHook = currentFiber.alternate?.stateHooks[stateHookIndex]
+  const stateHook = {
+    state: oldHook ? oldHook.state : initial,
+    queue: oldHook ? oldHook.queue : []
+  }
+
+  // 队列执行action
+  stateHook.queue.forEach(action => {
+    stateHook.state = action(stateHook.state)
+  })
+
+  stateHook.queue = []
+
+  stateHookIndex++;
+
+  stateHooks.push(stateHook)
+
+  currentFiber.stateHooks = stateHooks
+
+  function setState(action) {
+    // stateHook.state = action(stateHook.state)
+    stateHook.queue.push(typeof action === 'function' ? action : () => action)
+
+    wipRoot = {
+      ...currentFiber,
+      alternate: currentFiber
+    }
+    nextWorkUnit = wipRoot
+  }
+
+  return [stateHook.state, setState]
+}
+
 const React = {
   update,
   render,
+  useState,
   createElement
 }
 export default React
