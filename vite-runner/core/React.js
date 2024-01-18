@@ -8,7 +8,6 @@ const createElement = (type, props, ...children) => {
         return isTextNode ? createTextNode(child) : child
       })
     }
-
   }
 }
 const createTextNode = (text) => {
@@ -20,7 +19,6 @@ const createTextNode = (text) => {
     },
   }
 }
-
 const createDom = (type) => {
   return type === 'TEXT_NODE' ? document.createTextNode('') : document.createElement(type)
 }
@@ -87,8 +85,6 @@ const reconcileChildren = (fiber, children) => {
       }
     }
 
-
-
     if (oldFiber) {
       oldFiber = oldFiber.sibling
     }
@@ -101,6 +97,7 @@ const reconcileChildren = (fiber, children) => {
     if (newFiber) {
       prevChild = newFiber
     }
+
   })
 
   while (oldFiber) {
@@ -110,7 +107,6 @@ const reconcileChildren = (fiber, children) => {
 }
 
 const render = (el, container) => {
-
   wipRoot = {
     dom: container,
     props: {
@@ -118,7 +114,6 @@ const render = (el, container) => {
     }
   }
   nextWorkUnit = wipRoot
-
 }
 
 let wipRoot = null
@@ -130,11 +125,9 @@ function workLoop(IdleDeadline) {
   let shouldYield = false
   while (!shouldYield && nextWorkUnit) {
     nextWorkUnit = performanceWorkUnit(nextWorkUnit)
-
     if (wipRoot?.sibling?.type === nextWorkUnit?.type) {
       nextWorkUnit = undefined
     }
-
     shouldYield = IdleDeadline.timeRemaining() < 1
   }
   if (!nextWorkUnit && wipRoot) {
@@ -181,10 +174,8 @@ function commitWork(fiber) {
 }
 
 function updateFunctionComponent(fiber) {
-
   wipFiber = fiber
   let children = [fiber.type(fiber.props)]
-
   reconcileChildren(fiber, children)
 }
 function updateOriginComponent(fiber) {
@@ -193,33 +184,25 @@ function updateOriginComponent(fiber) {
     updateProps(dom, fiber.props, {})
   }
   let children = fiber.props.children
-
   reconcileChildren(fiber, children)
 }
 
 function performanceWorkUnit(fiber) {
   let isFunctionComponent = typeof fiber.type === 'function'
-
   if (isFunctionComponent) {
     updateFunctionComponent(fiber)
   } else {
     updateOriginComponent(fiber)
   }
-
-
   if (fiber.child) {
     return fiber.child
   }
-
   let nextFiber = fiber
   while (nextFiber) {
     if (nextFiber.sibling) return nextFiber.sibling
     nextFiber = nextFiber.parent
   }
-
-
 }
-
 
 requestIdleCallback(workLoop)
 
@@ -232,10 +215,7 @@ const update = () => {
     }
     nextWorkUnit = wipRoot
   }
-
 }
-
-
 
 const React = {
   update,
