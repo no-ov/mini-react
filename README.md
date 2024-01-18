@@ -22,3 +22,10 @@
 
 10. 实现事件绑定
 11. 实现更新 props
+
+## 击杀 update children
+
+12. diff-更新 children
+13. diff-删除多余老节点
+14. 解决 edge case 方式
+15. 优化更新 减少不必要的计算
