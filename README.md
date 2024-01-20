@@ -1,6 +1,6 @@
 # mini-react
 
-## 01. 实现最简 mini-react
+## 实现最简 mini-react
 
 1. 实现最简 mini-react
 2. 使用 jsx
@@ -8,7 +8,7 @@
 4. 扩展 - 自定义 react 的名字
 5. 副本玩法介绍&背后的学习原理
 
-## 02. 任务调度器&fiber 架构
+## 任务调度器&fiber 架构
 
 6. 实现任务调度器
 7. 实现 fiber
