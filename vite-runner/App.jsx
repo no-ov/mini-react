@@ -46,6 +46,10 @@ function Counter({ num }) {
 function Foo() {
   const [count, setCount] = React.useState(9);
   const [bar, setBar] = React.useState("bar");
+
+  React.useEffect(() => {
+    console.log("[ 111111 ] >", "init");
+  }, [count]);
   function handleClick() {
     setCount((c) => c + 1);
     setBar((pre) => pre + "bar");
