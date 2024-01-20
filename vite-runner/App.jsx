@@ -49,7 +49,12 @@ function Foo() {
 
   React.useEffect(() => {
     console.log("[ 111111 ] >", "init");
+  }, []);
+
+  React.useEffect(() => {
+    console.log("[ update ] >", count);
   }, [count]);
+
   function handleClick() {
     setCount((c) => c + 1);
     setBar((pre) => pre + "bar");
