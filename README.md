@@ -35,3 +35,8 @@
 16. 实现 useState
 17. 批量执行 action
 18. 减少不必要的更新
+
+## useEffect
+
+19. 实现 useEffect
+20. 实现 cleanup
