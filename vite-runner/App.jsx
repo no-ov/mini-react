@@ -48,11 +48,10 @@ function Foo() {
   const [bar, setBar] = React.useState("bar");
 
   React.useEffect(() => {
-    console.log("[ 111111 ] >", "init");
-  }, []);
-
-  React.useEffect(() => {
     console.log("[ update ] >", count);
+    return () => {
+      console.log("[ clean up] >");
+    };
   }, [count]);
 
   function handleClick() {

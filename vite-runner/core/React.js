@@ -153,18 +153,19 @@ function commitEffectHooks() {
     if (!fiber.alternate) {
       // init
       fiber.effectHooks?.forEach(hook => {
-        hook.effectHook?.callback()
+        hook.cleanup = hook.callback()
       })
     } else {
       // update
       fiber.effectHooks?.forEach((newHook, index) => {
-        const oldEffectHook = fiber.alternate?.effectHook[index]
-        const needUpdate = oldEffectHook?.deps.some((oldDep, idx) => {
-          return oldDep !== fiber.effectHook.deps[idx]
-        })
-        needUpdate && newHook.callback()
+        if (newHook.deps.length > 0) {
+          const oldEffectHook = fiber.alternate?.effectHooks[index]
+          const needUpdate = oldEffectHook?.deps.some((oldDep, idx) => {
+            return oldDep !== fiber.effectHook?.deps[idx]
+          })
+          needUpdate && (newHook.cleanup = newHook.callback())
+        }
       })
-
 
 
     }
@@ -173,6 +174,17 @@ function commitEffectHooks() {
     run(fiber.sibling)
   }
 
+  function runCleanup(fiber) {
+    if (!fiber) return
+    fiber.alternate?.effectHooks?.forEach(hook => {
+      hook.cleanup && hook.cleanup()
+    })
+
+    runCleanup(fiber.child)
+    runCleanup(fiber.sibling)
+
+  }
+  runCleanup(wipRoot)
   run(wipRoot)
 }
 
@@ -296,11 +308,11 @@ let effectHooks;
 function useEffect(callback, deps) {
   const effectHook = {
     callback,
-    deps
+    deps,
+    cleanup: undefined
   }
-
   effectHooks.push(effectHook)
-  wipFiber.effectHook = effectHook
+  wipFiber.effectHooks = effectHooks
 }
 
 const React = {
